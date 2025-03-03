@@ -28,20 +28,22 @@ def classify_points(uploaded_file):
     headers = {
         "Authorization": f"Bearer {api_key_enter}"
     }
-    with open(tmpfile_path, "rb") as f:
-        files = {"file": f}
-        try:
+    try:
+        with open(tmpfile_path, "rb") as f:
+            files = {"file": f}
             response = requests.post(url, files=files, headers=headers)
-        except :
-            st.error("Erreur d'API (clé ou service)")
-    
-    os.remove(tmpfile_path)
-    
-    if response.status_code == 200:
-        return np.array(response.json()["segmentation"], dtype=int)
+            
+        
+        os.remove(tmpfile_path)
+        
+        if response.status_code == 200:
+            return np.array(response.json()["segmentation"], dtype=int)
 
-    else:
-        st.error("Erreur lors de la classification : " + response.text)
+        else:
+            st.error("Erreur lors de la classification : " + response.text)
+            return None
+    except :
+        st.error("Erreur d'API (clé ou service)")
         return None
 
 
