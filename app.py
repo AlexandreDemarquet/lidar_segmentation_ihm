@@ -30,7 +30,10 @@ def classify_points(uploaded_file):
     }
     with open(tmpfile_path, "rb") as f:
         files = {"file": f}
-        response = requests.post(url, files=files, headers=headers)
+        try:
+            response = requests.post(url, files=files, headers=headers)
+        except :
+            st.error("Erreur d'API (clé ou service)")
     
     os.remove(tmpfile_path)
     
