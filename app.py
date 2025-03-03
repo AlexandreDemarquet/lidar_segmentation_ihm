@@ -53,65 +53,56 @@ st.title("Segmentation de Points LiDAR")
 st.write("Téléchargez des fichiers .laz/.las pour les classifier.")
 api_key_enter = st.text_input("Votre clé d'API:")
 
-if api_key_enter != st.secrets["API_KEY"] and api_key_enter != "":
-    st.error("ERREUR mauvaise clé d'API...")
 
-else:
+if "processed_files" not in st.session_state:
+    st.session_state["processed_files"] = {}
 
-    uploaded_files = st.file_uploader("Choisir des fichiers .laz", type=["laz", "las"], accept_multiple_files=True)
-    processed_files = {}
-    if uploaded_files:
-        st.success(f"{len(uploaded_files)} fichier(s) téléchargé(s) avec succès!")
-        progress_bar = st.progress(0)
-        nb_file = len(uploaded_files)
+uploaded_files = st.file_uploader("Choisir des fichiers .las/.laz", type=["laz", "las"], accept_multiple_files=True)
+if uploaded_files:
+    st.success(f"{len(uploaded_files)} fichier(s) téléchargé(s) avec succès!")
+    progress_bar = st.progress(0)
+    nb_file = len(uploaded_files)
+    uploaded_files_copy = uploaded_files.copy()
+    for i, uploaded_file in enumerate(uploaded_files_copy):
+        if uploaded_file.name not in st.session_state["processed_files"].keys():
+            with st.spinner(f"Traitement du fichier {uploaded_file.name}..."):
+                las, coords = load_laz_file(uploaded_file)
+                classes = classify_points(uploaded_file)
 
-        for i, uploaded_file in enumerate(uploaded_files):
-            if uploaded_file.name not in processed_files.keys():
-                with st.spinner(f"Traitement du fichier {uploaded_file.name}..."):
-                    las, coords = load_laz_file(uploaded_file)
-                    classes = classify_points(uploaded_file)
+                if classes is not None:
+                    classified_file = save_classified_file(las, classes)
+                    st.session_state["processed_files"][uploaded_file.name] = classified_file
+                    st.success(f"Fichier {uploaded_file.name} traité!")
+                else:
+                    st.error(f"Erreur lors de la classification de {uploaded_file.name}.")
 
-                    if classes is not None:
-                        classified_file = save_classified_file(las, classes)
-                        processed_files[uploaded_file.name] = classified_file
-                        st.success(f"Fichier {uploaded_file.name} traité!")
-                    else:
-                        st.error(f"Erreur lors de la classification de {uploaded_file.name}.")
-
-                progress_bar.progress((i + 1) / nb_file)
+            progress_bar.progress((i + 1) / nb_file)
 
 
-    l_file_to_suprr = []
-    for uploaded_file in uploaded_files:
-        if uploaded_file.name in processed_files.keys():
-            l_file_to_suprr.append(uploaded_file)
-
-    for file in l_file_to_suprr:
-        uploaded_files.remove(file)
 
 
-    if processed_files:
-        st.write("### Télécharger les fichiers classifiés :")
-        
-        for filename, filepath in processed_files.items():
-            with open(filepath, "rb") as f:
-                st.download_button(
-                    label=f"Télécharger {filename}",
-                    data=f,
-                    file_name=f"classified_{filename}",
-                    mime="application/octet-stream"
-                )
-        
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".zip") as tmp_zip:
-            with zipfile.ZipFile(tmp_zip.name, 'w') as zipf:
-                for filename, filepath in processed_files.items():
-                    zipf.write(filepath, arcname=f"classified_{filename}")
-            zip_path = tmp_zip.name
-        
-        with open(zip_path, "rb") as f:
+if st.session_state["processed_files"]:
+    st.write("### Télécharger les fichiers classifiés :")
+    
+    for filename, filepath in st.session_state["processed_files"].items():
+        with open(filepath, "rb") as f:
             st.download_button(
-                label="Télécharger tous les fichiers classifiés",
+                label=f"Télécharger {filename}",
                 data=f,
-                file_name="classified_files.zip",
-                mime="application/zip"
+                file_name=f"classified_{filename}",
+                mime="application/octet-stream"
             )
+    
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".zip") as tmp_zip:
+        with zipfile.ZipFile(tmp_zip.name, 'w') as zipf:
+            for filename, filepath in st.session_state["processed_files"].items():
+                zipf.write(filepath, arcname=f"classified_{filename}")
+        zip_path = tmp_zip.name
+    
+    with open(zip_path, "rb") as f:
+        st.download_button(
+            label="Télécharger tous les fichiers classifiés",
+            data=f,
+            file_name="classified_files.zip",
+            mime="application/zip"
+        )
