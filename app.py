@@ -53,7 +53,7 @@ st.title("Segmentation de Points LiDAR")
 st.write("Téléchargez des fichiers .laz/.las pour les classifier.")
 api_key = st.text_input("Votre clé d'API:")
 
-if api_key != st.secret["API_KEY"]:
+if api_key != st.secrets["API_KEY"]:
     st.error("ERREUR mauvaise clé d'API...")
 
 else:
