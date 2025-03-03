@@ -1,2 +1,1 @@
-laspy
-zipfile
+laspy[lazrs,laszip]
