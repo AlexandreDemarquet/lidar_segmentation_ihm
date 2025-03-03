@@ -26,7 +26,7 @@ def classify_points(uploaded_file):
         tmpfile_path = tmpfile.name
 
     headers = {
-        "Authorization": f"Bearer {api_key}"
+        "Authorization": f"Bearer {api_key_enter}"
     }
     with open(tmpfile_path, "rb") as f:
         files = {"file": f}
