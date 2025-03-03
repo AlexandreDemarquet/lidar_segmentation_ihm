@@ -51,9 +51,9 @@ def save_classified_file(las, classes):
 
 st.title("Segmentation de Points LiDAR")
 st.write("Téléchargez des fichiers .laz/.las pour les classifier.")
-api_key = st.text_input("Votre clé d'API:")
+api_key_enter = st.text_input("Votre clé d'API:")
 
-if api_key != st.secrets["API_KEY"]:
+if api_key_enter != st.secrets["API_KEY"] and api_key_enter != "":
     st.error("ERREUR mauvaise clé d'API...")
 
 else:
