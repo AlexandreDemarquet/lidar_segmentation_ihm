@@ -1,0 +1,8 @@
+[theme]
+primaryColor = "#7289DA"           # Blurple Discord pour l'accent  
+backgroundColor = "#F2F3F5"        # Gris clair pastel pour un fond doux et lisible  
+secondaryBackgroundColor = "#DCDDE1" # Gris légèrement plus foncé pour la hiérarchie visuelle  
+textColor = "#2E3338"              # Gris anthracite pour un bon contraste et une lecture confortable  
+accentColor = "#F8BBD0"            # Rose pastel pour adoucir l’interface  
+highlightColor = "#FF1744"         # Bleu pastel lumineux pour les éléments interactifs  
+font = "monospace"

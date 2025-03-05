@@ -84,8 +84,6 @@ if uploaded_files:
             progress_bar.progress((i + 1) / nb_file)
 
 
-
-
 if st.session_state["processed_files"]:
     st.write("### Télécharger les fichiers classifiés :")
     
